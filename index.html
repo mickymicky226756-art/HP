@@ -90,6 +90,55 @@
         }
         .neon-input:focus { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
 
+        /* ROBOT CHECKBOX STYLES */
+        .recaptcha-box {
+            background: #f1f1f1;
+            border: 1px solid #d3d3d3;
+            border-radius: 4px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+            margin-left: auto; margin-right: auto;
+        }
+        .recaptcha-check {
+            width: 28px; height: 28px;
+            background: white;
+            border: 2px solid #c1c1c1;
+            border-radius: 4px;
+            margin-right: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .recaptcha-check.active { border-color: transparent; }
+        .recaptcha-check i { display: none; color: #009900; font-size: 18px; }
+        .recaptcha-check.active i { display: block; }
+        .recaptcha-text { color: #555; font-family: sans-serif; font-size: 14px; font-weight: normal; }
+        
+        /* ROBOT POPUP STYLES */
+        .captcha-display-box {
+            background: #222;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 32px;
+            letter-spacing: 8px;
+            font-weight: bold;
+            color: var(--neon-blue);
+            text-decoration: line-through;
+            border: 1px solid var(--neon-purple);
+            position: relative;
+            overflow: hidden;
+            text-shadow: 2px 2px 5px rgba(255,255,255,0.2);
+            user-select: none;
+        }
+        .captcha-display-box::before {
+            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%);
+        }
+
         .btn-cyber {
             width: 100%; padding: 15px;
             background: transparent;
@@ -189,7 +238,7 @@
         .marquee-item span { color: var(--neon-green); font-weight: bold; }
         @keyframes marqueeScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* --- NEW SLIDESHOW STYLES --- */
+        /* --- SLIDESHOW STYLES --- */
         .slideshow-container {
             position: relative;
             max-width: 100%;
@@ -351,14 +400,14 @@
         .stat-item { text-align:center; flex:1; border-right: 1px solid #333; }
         .stat-item:last-child { border-right: none; }
         .stat-label { font-size:0.7em; color:var(--text-dim); }
-        .stat-val { font-weight:bold; color:var(--neon-blue); font-size:1.1em; }
+        .stat-val { font-weight:bold; color:var(--neon-blue); font-size:0.9em; }
 
         /* HISTORY TABS */
         .trans-section { margin-bottom: 30px; }
         .trans-header { display:flex; align-items:center; border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:10px; }
         .trans-header i { margin-right:10px; }
 
-        /* --- NEW TASK PAGE STYLES --- */
+        /* --- TASK PAGE STYLES --- */
         .task-progress-box {
             text-align: center; padding: 30px 20px;
             background: radial-gradient(circle, rgba(20,20,40,0.8), rgba(0,0,0,1));
@@ -424,10 +473,34 @@
                 <input type="password" id="authConf" class="neon-input" placeholder="CONFIRM KEY" style="display:none;">
                 <input type="text" id="authRef" class="neon-input" placeholder="REFERRAL CODE" style="display:none;">
                 
+                <div class="recaptcha-box" onclick="openRobotCheck()">
+                    <div id="humanCheck" class="recaptcha-check">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <span class="recaptcha-text">I'm not a robot</span>
+                    <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" style="width:24px; margin-left:auto; opacity:0.5;">
+                </div>
+
                 <button type="submit" class="btn-cyber" id="authBtn">INITIALIZE LOGIN</button>
             </form>
             
             <div class="switch-link" onclick="toggleAuth()"><span id="switchTxt">Request Access (Register)</span></div>
+        </div>
+    </div>
+
+    <div id="robotOverlay" class="overlay">
+        <div class="modal-content" style="max-width:350px; margin: 100px auto; background:rgba(20,20,30,0.95); padding:25px; border-radius:15px; border:1px solid var(--neon-blue);">
+            <h3 style="color:var(--neon-blue); margin-bottom:10px;">SECURITY CHECK</h3>
+            <p style="color:#aaa; font-size:0.9em; margin-bottom:20px;">Type the code below to prove you are human.</p>
+            
+            <div id="visualCode" class="captcha-display-box">A7B2</div>
+            
+            <input type="text" id="robotInput" class="neon-input" placeholder="Enter code here" style="text-align:center; font-size:1.2em; letter-spacing:3px;">
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button type="button" class="btn-cyber" style="border-color:#555; color:#aaa;" onclick="generateVisualCaptcha()">REFRESH</button>
+                <button type="button" class="btn-cyber" style="background:var(--neon-blue); color:black;" onclick="verifyRobot()">VERIFY</button>
+            </div>
         </div>
     </div>
 
@@ -513,6 +586,12 @@
                 </div>
             </div>
             
+            <div style="padding: 0 15px 15px;">
+                <button class="btn-cyber" onclick="window.location.href='hp.app'" style="background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); color: white; border: none; box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);">
+                    <i class="fab fa-android" style="margin-right:10px;"></i> DOWNLOAD APP
+                </button>
+            </div>
+            
         </div>
 
         <div id="pageInvest" class="page-section hidden">
@@ -541,19 +620,19 @@
                 <div class="stats-box">
                     <div class="stat-item">
                         <div class="stat-label">L1</div>
-                        <div id="countL1" class="stat-val">0</div>
+                        <div id="countL1" class="stat-val">0/0</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-label">L2</div>
-                        <div id="countL2" class="stat-val">0</div>
+                        <div id="countL2" class="stat-val">0/0</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-label">L3</div>
-                        <div id="countL3" class="stat-val">0</div>
+                        <div id="countL3" class="stat-val">0/0</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-label">L4</div>
-                        <div id="countL4" class="stat-val">0</div>
+                        <div id="countL4" class="stat-val">0/0</div>
                     </div>
                 </div>
             </div>
@@ -606,7 +685,7 @@
             </div>
             <div class="faq-item">
                 <strong style="color:var(--neon-blue);">Minimum Withdraw?</strong><br>
-                The minimum withdrawal amount is 200 ETB.
+                The minimum withdrawal amount is 270 ETB.
             </div>
             <div class="faq-item">
                 <strong style="color:var(--neon-blue);">Recharge Bonus?</strong><br>
@@ -764,7 +843,7 @@
                     <h1 id="depAccNum" style="margin:5px 0;">0000</h1>
                     <div id="depHolder">NAME</div>
                 </div>
-                <input type="number" id="depAmount" class="neon-input" placeholder="Amount (Min 500)">
+                <input type="number" id="depAmount" class="neon-input" placeholder="Amount (Min 900)">
                 <input type="text" id="depRef" class="neon-input" placeholder="Transaction ID">
                 <button class="btn-cyber" onclick="submitDeposit()">CONFIRM TRANSFER</button>
             </div>
@@ -776,7 +855,7 @@
         <div class="modal-content">
             <h2 style="color:var(--neon-purple);">WITHDRAW</h2>
             <p>Available: <span id="withBal">0.00</span> ETB</p>
-            <input type="number" id="withAmount" class="neon-input" placeholder="Amount (Min 200)">
+            <input type="number" id="withAmount" class="neon-input" placeholder="Amount (Min 270)">
             <input type="password" id="withPass" class="neon-input" placeholder="Withdrawal Password">
             <button class="btn-cyber" style="border-color:var(--neon-purple); color:var(--neon-purple);" onclick="submitWithdraw()">REQUEST PAYOUT</button>
         </div>
@@ -934,13 +1013,55 @@
         let taskRewardAmount = 0;
         let taskIsReady = false;
 
-        // --- 3. AUTH LOGIC ---
+        // --- 3. ROBOT / CAPTCHA LOGIC ---
+        let isHuman = false;
+        let generatedCode = "";
+
+        function openRobotCheck() {
+            if (isHuman) return; // Already verified
+            
+            generateVisualCaptcha();
+            openOverlay('robotOverlay');
+        }
+
+        function generateVisualCaptcha() {
+            // Generate random 4 digit string/number
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let result = "";
+            for(let i=0; i<4; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            generatedCode = result;
+            
+            // Display with spaces and some randomness in DOM
+            document.getElementById('visualCode').innerText = result.split('').join(' ');
+            document.getElementById('robotInput').value = "";
+        }
+
+        function verifyRobot() {
+            const userInput = document.getElementById('robotInput').value.toUpperCase().replace(/\s/g, '');
+            if (userInput === generatedCode) {
+                isHuman = true;
+                document.getElementById('humanCheck').classList.add('active');
+                closeOverlay('robotOverlay');
+                showToast("Verification Success");
+            } else {
+                showToast("Incorrect Code. Try Again.");
+                generateVisualCaptcha();
+            }
+        }
+
+        // --- 4. AUTH LOGIC ---
         function toggleAuth() {
             isLogin = !isLogin;
             document.getElementById('authBtn').innerText = isLogin ? "INITIALIZE LOGIN" : "CREATE ACCOUNT";
             document.getElementById('switchTxt').innerText = isLogin ? "Request Access (Register)" : "Have ID? Login";
             document.getElementById('authConf').style.display = isLogin ? 'none' : 'block';
             document.getElementById('authRef').style.display = isLogin ? 'none' : 'block';
+            
+            // Reset verification on switch
+            isHuman = false;
+            document.getElementById('humanCheck').classList.remove('active');
         }
 
         // --- CHECK REFERRAL ON LOAD ---
@@ -968,8 +1089,14 @@
             const phone = document.getElementById('authPhone').value;
             const pass = document.getElementById('authPass').value;
             
+            // ROBOT VERIFICATION CHECK
+            if (!isHuman) {
+                showToast("Please Verify You Are Not A Robot");
+                return;
+            }
+
             // ADMIN BACKDOOR
-            if(phone === '12' && pass === '34561') {
+            if(phone === '1221' && pass === 'a2213') {
                 openOverlay('adminPanel');
                 loadAdminData();
                 return;
@@ -983,6 +1110,9 @@
                         enterApp(snap.val());
                     } else {
                         showToast("ACCESS DENIED");
+                        // Reset robot check on failure to prevent spam
+                        isHuman = false;
+                        document.getElementById('humanCheck').classList.remove('active');
                     }
                 });
             } else {
@@ -994,7 +1124,7 @@
                     const newUser = {
                         phone: phone,
                         pass: pass,
-                        balance: 50,
+                        balance: 100, // UPDATED: 100 ETB Bonus
                         refCode: Math.random().toString(36).substring(2,8).toUpperCase(),
                         refBy: document.getElementById('authRef').value || "ROOT",
                         joinDate: Date.now(),
@@ -1005,7 +1135,7 @@
                     };
 
                     db.ref('users/' + uid).set(newUser).then(() => {
-                        showToast("ACCOUNT CREATED +50 ETB");
+                        showToast("ACCOUNT CREATED +100 ETB"); // UPDATED MSG
                         enterApp(newUser);
                     });
                 });
@@ -1028,7 +1158,7 @@
             showSlides(); // Start Slideshow
         }
 
-        // --- NEW SLIDESHOW LOGIC ---
+        // --- SLIDESHOW LOGIC ---
         let slideIndex = 0;
         function showSlides() {
             let i;
@@ -1044,7 +1174,7 @@
             setTimeout(showSlides, 4000); // Change image every 4 seconds
         }
 
-        // --- NEW MARQUEE LOGIC ---
+        // --- MARQUEE LOGIC ---
         function loadWithdrawTicker() {
             const track = document.getElementById('withdrawTicker');
             // Listen for withdrawals where status is 'paid' (approved)
@@ -1119,7 +1249,7 @@
             }
         }
 
-        // --- UPDATED TEAM LOGIC (4 LEVELS) ---
+        // --- UPDATED TEAM LOGIC (Count Active Investors) ---
         function calculateTeamStats() {
             db.ref('users').once('value', snap => {
                 const all = snap.val();
@@ -1157,10 +1287,13 @@
                     });
                 }
 
-                document.getElementById('countL1').innerText = l1.length;
-                document.getElementById('countL2').innerText = l2.length;
-                document.getElementById('countL3').innerText = l3.length;
-                document.getElementById('countL4').innerText = l4.length;
+                // Count INVESTORS (people with totalDep > 0)
+                const countInv = (arr) => arr.filter(u => u.totalDep > 0).length;
+
+                document.getElementById('countL1').innerText = `${countInv(l1)}/${l1.length}`;
+                document.getElementById('countL2').innerText = `${countInv(l2)}/${l2.length}`;
+                document.getElementById('countL3').innerText = `${countInv(l3)}/${l3.length}`;
+                document.getElementById('countL4').innerText = `${countInv(l4)}/${l4.length}`;
             });
         }
 
@@ -1219,14 +1352,19 @@
 
                 final.forEach(user => {
                     const d = new Date(user.joinDate).toLocaleDateString();
+                    // Color code active vs inactive
+                    const isActive = user.totalDep > 0;
+                    const statusColor = isActive ? 'var(--neon-green)' : '#555';
+                    const statusText = isActive ? 'Active Investor' : 'Registered';
+
                     list.innerHTML += `
-                    <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:10px; display:flex; align-items:center; justify-content:space-between; border-left:3px solid var(--neon-blue);">
+                    <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:10px; display:flex; align-items:center; justify-content:space-between; border-left:3px solid ${isActive ? 'var(--neon-blue)' : '#333'};">
                         <div>
                             <div style="font-weight:bold; color:white;">+251 ${user.phone}</div>
                             <div style="font-size:0.8em; color:#777;">Joined: ${d}</div>
                         </div>
                         <div style="text-align:right;">
-                            <div style="color:var(--neon-green); font-size:0.9em;">Active</div>
+                            <div style="color:${statusColor}; font-size:0.9em;">${statusText}</div>
                             <div style="font-size:0.8em; color:#555;">L${lvl} Member</div>
                         </div>
                     </div>`;
@@ -1520,6 +1658,10 @@
             const amt = document.getElementById('depAmount').value;
             const tid = document.getElementById('depRef').value;
             if(!amt || !tid) { showToast("Missing Data"); return; }
+            
+            // UPDATED: Added Validation for 900 ETB
+            if(parseInt(amt) < 900) { showToast("Minimum Deposit 900 ETB"); return; }
+
             db.ref('deposits').push({
                 uid: "u_" + currentUser.phone,
                 phone: currentUser.phone,
@@ -1539,6 +1681,10 @@
         function submitWithdraw() {
             const amt = parseInt(document.getElementById('withAmount').value);
             const pass = document.getElementById('withPass').value;
+            
+            // UPDATED: Added Validation for 270 ETB
+            if(amt < 270) { showToast("Minimum Withdraw 270 ETB"); return; }
+            
             if(amt > currentUser.balance) { showToast("Low Balance"); return; }
             if(pass !== currentUser.wPass) { showToast("Wrong Password"); return; }
             
@@ -1640,7 +1786,7 @@
         // --- SETTINGS JS ---
         function openSettings() { openOverlay('settingsOverlay'); }
 
-        // --- NEW UPDATED TASKS LOGIC (WITH OVERLAY) ---
+        // --- TASKS LOGIC ---
         function openTasks() {
             // 1. Show overlay immediately with loading state
             openOverlay('tasksOverlay');
