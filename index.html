@@ -1726,7 +1726,7 @@
                     const data = [];
                     snap.forEach(s => data.push(s.val()));
                     data.reverse().forEach(d => {
-                        let color = d.status === 'approved' ? 'var(--neon-green)' : '#ffcc00';
+                        let color = d.status === 'approved' ? 'var(--neon-green)' : (d.status === 'rejected' ? 'red' : '#ffcc00');
                         depList.innerHTML += `
                         <div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:5px; border-radius:5px; border-left:3px solid ${color};">
                             <div style="display:flex; justify-content:space-between;">
@@ -1979,9 +1979,13 @@
                 snap.forEach(c => {
                     const v = c.val();
                     if(v.status === 'pending') {
+                        // ADDED: Reject Button
                         d.innerHTML += `<div style="border-bottom:1px solid #333; padding:5px; color:white;">
                             ${v.phone} - ${v.amount} ETB <br> TID: ${v.tid} 
-                            <button class="btn-adm-approve" onclick="approveDep('${c.key}', '${v.uid}', ${v.amount})">Approve</button>
+                            <div style="margin-top:5px;">
+                                <button class="btn-adm-approve" onclick="approveDep('${c.key}', '${v.uid}', ${v.amount})">Approve</button>
+                                <button class="btn-adm-del" onclick="admRejectDeposit('${c.key}')">Reject</button>
+                            </div>
                         </div>`;
                     }
                 });
@@ -2081,6 +2085,14 @@
                     totalDep: curDep + amt
                 });
             });
+        }
+
+        // --- NEW: REJECT DEPOSIT FUNCTION ---
+        function admRejectDeposit(key) {
+            if(confirm("Are you sure you want to REJECT this deposit?")) {
+                db.ref('deposits/' + key).update({ status: 'rejected' });
+                alert("Deposit Rejected.");
+            }
         }
 
         // --- ADMIN WITHDRAWAL FUNCTIONS ---
