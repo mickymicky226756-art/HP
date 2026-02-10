@@ -1020,8 +1020,13 @@
         function openRobotCheck() {
             if (isHuman) return; // Already verified
             
-            generateVisualCaptcha();
-            openOverlay('robotOverlay');
+            // MODIFIED: Direct verification (No popup/text)
+            isHuman = true;
+            document.getElementById('humanCheck').classList.add('active');
+            
+            // Commented out original popup logic
+            // generateVisualCaptcha();
+            // openOverlay('robotOverlay');
         }
 
         function generateVisualCaptcha() {
