@@ -1667,12 +1667,14 @@
             // UPDATED: Added Validation for 900 ETB
             if(parseInt(amt) < 900) { showToast("Minimum Deposit 900 ETB"); return; }
 
+            // UPDATED: Added Date.now() for proper sorting
             db.ref('deposits').push({
                 uid: "u_" + currentUser.phone,
                 phone: currentUser.phone,
                 amount: parseInt(amt),
                 tid: tid,
-                status: 'pending'
+                status: 'pending',
+                date: Date.now() 
             });
             showToast("Processing Request...");
             closeOverlay('depositOverlay');
@@ -1712,7 +1714,7 @@
             closeOverlay('withdrawOverlay');
         }
 
-        // --- UPDATED HISTORY FUNCTION ---
+        // --- UPDATED HISTORY FUNCTION (FIXED "SHOW ALL" & "SORT ORDER") ---
         function openHistory() {
             openOverlay('historyOverlay');
             const depList = document.getElementById('list-deposits');
@@ -1729,16 +1731,33 @@
                 if(!snap.exists()) { depList.innerHTML = "<small style='color:#666;'>No Deposits</small>"; }
                 else {
                     const data = [];
-                    snap.forEach(s => data.push(s.val()));
-                    data.reverse().forEach(d => {
+                    // Collect ALL items first
+                    snap.forEach(s => {
+                        let item = s.val();
+                        item.key = s.key; 
+                        data.push(item);
+                    });
+                    
+                    // SORT by Date (Newest First)
+                    // If date is missing (old data), rely on array reverse which approximates
+                    data.sort((a, b) => (b.date || 0) - (a.date || 0));
+                    
+                    if(data.length === 0) { depList.innerHTML = "<small style='color:#666;'>No Deposits</small>"; }
+
+                    data.forEach(d => {
                         let color = d.status === 'approved' ? 'var(--neon-green)' : (d.status === 'rejected' ? 'red' : '#ffcc00');
+                        let dateStr = d.date ? new Date(d.date).toLocaleDateString() : '';
+                        
                         depList.innerHTML += `
                         <div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:5px; border-radius:5px; border-left:3px solid ${color};">
                             <div style="display:flex; justify-content:space-between;">
                                 <span style="font-weight:bold; color:white;">+${d.amount} ETB</span>
                                 <span style="color:${color}; font-size:0.8em; font-weight:bold;">${d.status.toUpperCase()}</span>
                             </div>
-                            <div style="font-size:0.7em; color:#666;">TID: ${d.tid}</div>
+                            <div style="display:flex; justify-content:space-between; font-size:0.7em; color:#666; margin-top:2px;">
+                                <span>TID: ${d.tid}</span>
+                                <span>${dateStr}</span>
+                            </div>
                         </div>`;
                     });
                 }
@@ -1751,7 +1770,11 @@
                 else {
                     const data = [];
                     snap.forEach(s => data.push(s.val()));
-                    data.reverse().forEach(w => {
+                    
+                    // Sort Newest First
+                    data.sort((a, b) => (b.date || 0) - (a.date || 0));
+
+                    data.forEach(w => {
                         let status = w.status || 'pending';
                         let color = status === 'paid' ? 'var(--neon-green)' : (status === 'rejected' ? 'red' : '#bc13fe');
                         let date = w.date ? new Date(w.date).toLocaleDateString() : '---';
@@ -1772,8 +1795,13 @@
                 invList.innerHTML = "";
                 if(!snap.exists()) { invList.innerHTML = "<small style='color:#666;'>No Investments</small>"; }
                 else {
-                    snap.forEach(c => {
-                        const p = c.val();
+                    const data = [];
+                    snap.forEach(s => data.push(s.val()));
+                    
+                    // Sort Newest First
+                    data.sort((a, b) => (b.date || 0) - (a.date || 0));
+
+                    data.forEach(p => {
                         const date = new Date(p.date).toLocaleDateString();
                         invList.innerHTML += `
                         <div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:5px; border-radius:5px; border-left:3px solid var(--neon-blue);">
